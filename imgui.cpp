@@ -2554,6 +2554,8 @@ ImGuiTextFilter::ImGuiTextFilter(const char* default_filter) //-V1077
 
 bool ImGuiTextFilter::Draw(const char* label, float width)
 {
+    IM_UNUSED(Ctx); // Will be used when the context will become explicit
+
     if (width != 0.0f)
         ImGui::SetNextItemWidth(width);
     bool value_changed = ImGui::InputText(label, InputBuf, IM_ARRAYSIZE(InputBuf));
@@ -2786,9 +2788,12 @@ static void ImGuiListClipper_SeekCursorForItem(ImGuiListClipper* clipper, int it
     ImGuiListClipper_SeekCursorAndSetupPrevLine(pos_y, clipper->ItemsHeight);
 }
 
-ImGuiListClipper::ImGuiListClipper()
+ImGuiListClipper::ImGuiListClipper(ImGuiContext* ctx)
 {
     memset(this, 0, sizeof(*this));
+    Ctx = ctx;
+    IM_ASSERT(Ctx != NULL);
+    ItemsCount = -1;
 }
 
 ImGuiListClipper::~ImGuiListClipper()
@@ -14711,7 +14716,7 @@ void ImGui::DebugNodeDrawList(ImGuiWindow* window, ImGuiViewportP* viewport, con
             DebugNodeDrawCmdShowMeshAndBoundingBox(fg_draw_list, draw_list, pcmd, true, false);
 
         // Display individual triangles/vertices. Hover on to get the corresponding triangle highlighted.
-        ImGuiListClipper clipper;
+        ImGuiListClipper clipper(&g);
         clipper.Begin(pcmd->ElemCount / 3); // Manually coarse clip our print out of individual vertices to save CPU, only items that may be visible.
         while (clipper.Step())
             for (int prim = clipper.DisplayStart, idx_i = pcmd->IdxOffset + clipper.DisplayStart * 3; prim < clipper.DisplayEnd; prim++)
@@ -15126,7 +15131,7 @@ void ImGui::ShowDebugLogWindow(bool* p_open)
     const ImGuiDebugLogFlags backup_log_flags = g.DebugLogFlags;
     g.DebugLogFlags &= ~ImGuiDebugLogFlags_EventClipper;
 
-    ImGuiListClipper clipper;
+    ImGuiListClipper clipper(&g);
     clipper.Begin(g.DebugLogIndex.size());
     while (clipper.Step())
         for (int line_no = clipper.DisplayStart; line_no < clipper.DisplayEnd; line_no++)
