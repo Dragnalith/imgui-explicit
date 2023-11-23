@@ -886,7 +886,7 @@ static void ConvertNSRect(NSRect* r)
     r->origin.y = firstScreenFrame.size.height - r->origin.y - r->size.height;
 }
 
-static void ImGui_ImplOSX_CreateWindow(ImGuiViewport* viewport)
+static void ImGui_ImplOSX_CreateWindow(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplOSX_Data* bd = ImGui_ImplOSX_GetBackendData();
     ImGuiViewportDataOSX* data = IM_NEW(ImGuiViewportDataOSX)();
@@ -925,7 +925,7 @@ static void ImGui_ImplOSX_CreateWindow(ImGuiViewport* viewport)
     viewport->PlatformHandle = viewport->PlatformHandleRaw = (__bridge_retained void*)window;
 }
 
-static void ImGui_ImplOSX_DestroyWindow(ImGuiViewport* viewport)
+static void ImGui_ImplOSX_DestroyWindow(ImGuiContext*, ImGuiViewport* viewport)
 {
     NSWindow* window = (__bridge_transfer NSWindow*)viewport->PlatformHandleRaw;
     window = nil;
@@ -945,7 +945,7 @@ static void ImGui_ImplOSX_DestroyWindow(ImGuiViewport* viewport)
     viewport->PlatformUserData = viewport->PlatformHandle = viewport->PlatformHandleRaw = nullptr;
 }
 
-static void ImGui_ImplOSX_ShowWindow(ImGuiViewport* viewport)
+static void ImGui_ImplOSX_ShowWindow(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGuiViewportDataOSX* data = (ImGuiViewportDataOSX*)viewport->PlatformUserData;
     IM_ASSERT(data->Window != 0);
@@ -958,7 +958,7 @@ static void ImGui_ImplOSX_ShowWindow(ImGuiViewport* viewport)
     [data->Window setIsVisible:YES];
 }
 
-static ImVec2 ImGui_ImplOSX_GetWindowPos(ImGuiViewport* viewport)
+static ImVec2 ImGui_ImplOSX_GetWindowPos(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGuiViewportDataOSX* data = (ImGuiViewportDataOSX*)viewport->PlatformUserData;
     IM_ASSERT(data->Window != 0);
@@ -973,7 +973,7 @@ static ImVec2 ImGui_ImplOSX_GetWindowPos(ImGuiViewport* viewport)
     return ImVec2(frame.origin.x, firstScreenFrame.size.height - frame.origin.y - contentRect.size.height);
 }
 
-static void ImGui_ImplOSX_SetWindowPos(ImGuiViewport* viewport, ImVec2 pos)
+static void ImGui_ImplOSX_SetWindowPos(ImGuiContext*, ImGuiViewport* viewport, ImVec2 pos)
 {
     ImGuiViewportDataOSX* data = (ImGuiViewportDataOSX*)viewport->PlatformUserData;
     IM_ASSERT(data->Window != 0);
@@ -986,7 +986,7 @@ static void ImGui_ImplOSX_SetWindowPos(ImGuiViewport* viewport, ImVec2 pos)
     [window setFrameOrigin:r.origin];
 }
 
-static ImVec2 ImGui_ImplOSX_GetWindowSize(ImGuiViewport* viewport)
+static ImVec2 ImGui_ImplOSX_GetWindowSize(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGuiViewportDataOSX* data = (ImGuiViewportDataOSX*)viewport->PlatformUserData;
     IM_ASSERT(data->Window != 0);
@@ -996,7 +996,7 @@ static ImVec2 ImGui_ImplOSX_GetWindowSize(ImGuiViewport* viewport)
     return ImVec2(size.width, size.height);
 }
 
-static void ImGui_ImplOSX_SetWindowSize(ImGuiViewport* viewport, ImVec2 size)
+static void ImGui_ImplOSX_SetWindowSize(ImGuiContext*, ImGuiViewport* viewport, ImVec2 size)
 {
     ImGuiViewportDataOSX* data = (ImGuiViewportDataOSX*)viewport->PlatformUserData;
     IM_ASSERT(data->Window != 0);
@@ -1009,7 +1009,7 @@ static void ImGui_ImplOSX_SetWindowSize(ImGuiViewport* viewport, ImVec2 size)
     [window setFrame:rect display:YES];
 }
 
-static void ImGui_ImplOSX_SetWindowFocus(ImGuiViewport* viewport)
+static void ImGui_ImplOSX_SetWindowFocus(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplOSX_Data* bd = ImGui_ImplOSX_GetBackendData();
     ImGuiViewportDataOSX* data = (ImGuiViewportDataOSX*)viewport->PlatformUserData;
@@ -1017,7 +1017,7 @@ static void ImGui_ImplOSX_SetWindowFocus(ImGuiViewport* viewport)
     [data->Window makeKeyAndOrderFront:bd->Window];
 }
 
-static bool ImGui_ImplOSX_GetWindowFocus(ImGuiViewport* viewport)
+static bool ImGui_ImplOSX_GetWindowFocus(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGuiViewportDataOSX* data = (ImGuiViewportDataOSX*)viewport->PlatformUserData;
     IM_ASSERT(data->Window != 0);
@@ -1025,7 +1025,7 @@ static bool ImGui_ImplOSX_GetWindowFocus(ImGuiViewport* viewport)
     return data->Window.isKeyWindow;
 }
 
-static bool ImGui_ImplOSX_GetWindowMinimized(ImGuiViewport* viewport)
+static bool ImGui_ImplOSX_GetWindowMinimized(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGuiViewportDataOSX* data = (ImGuiViewportDataOSX*)viewport->PlatformUserData;
     IM_ASSERT(data->Window != 0);
@@ -1033,7 +1033,7 @@ static bool ImGui_ImplOSX_GetWindowMinimized(ImGuiViewport* viewport)
     return data->Window.isMiniaturized;
 }
 
-static void ImGui_ImplOSX_SetWindowTitle(ImGuiViewport* viewport, const char* title)
+static void ImGui_ImplOSX_SetWindowTitle(ImGuiContext*, ImGuiViewport* viewport, const char* title)
 {
     ImGuiViewportDataOSX* data = (ImGuiViewportDataOSX*)viewport->PlatformUserData;
     IM_ASSERT(data->Window != 0);
@@ -1041,7 +1041,7 @@ static void ImGui_ImplOSX_SetWindowTitle(ImGuiViewport* viewport, const char* ti
     data->Window.title = [NSString stringWithUTF8String:title];
 }
 
-static void ImGui_ImplOSX_SetWindowAlpha(ImGuiViewport* viewport, float alpha)
+static void ImGui_ImplOSX_SetWindowAlpha(ImGuiContext*, ImGuiViewport* viewport, float alpha)
 {
     ImGuiViewportDataOSX* data = (ImGuiViewportDataOSX*)viewport->PlatformUserData;
     IM_ASSERT(data->Window != 0);
@@ -1050,7 +1050,7 @@ static void ImGui_ImplOSX_SetWindowAlpha(ImGuiViewport* viewport, float alpha)
     data->Window.alphaValue = alpha;
 }
 
-static float ImGui_ImplOSX_GetWindowDpiScale(ImGuiViewport* viewport)
+static float ImGui_ImplOSX_GetWindowDpiScale(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGuiViewportDataOSX* data = (ImGuiViewportDataOSX*)viewport->PlatformUserData;
     IM_ASSERT(data->Window != 0);

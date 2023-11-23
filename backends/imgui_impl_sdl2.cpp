@@ -830,7 +830,7 @@ struct ImGui_ImplSDL2_ViewportData
     ~ImGui_ImplSDL2_ViewportData() { IM_ASSERT(Window == nullptr && GLContext == nullptr); }
 };
 
-static void ImGui_ImplSDL2_CreateWindow(ImGuiViewport* viewport)
+static void ImGui_ImplSDL2_CreateWindow(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplSDL2_Data* bd = ImGui_ImplSDL2_GetBackendData();
     ImGui_ImplSDL2_ViewportData* vd = IM_NEW(ImGui_ImplSDL2_ViewportData)();
@@ -886,7 +886,7 @@ static void ImGui_ImplSDL2_CreateWindow(ImGuiViewport* viewport)
     }
 }
 
-static void ImGui_ImplSDL2_DestroyWindow(ImGuiViewport* viewport)
+static void ImGui_ImplSDL2_DestroyWindow(ImGuiContext*, ImGuiViewport* viewport)
 {
     if (ImGui_ImplSDL2_ViewportData* vd = (ImGui_ImplSDL2_ViewportData*)viewport->PlatformUserData)
     {
@@ -901,7 +901,7 @@ static void ImGui_ImplSDL2_DestroyWindow(ImGuiViewport* viewport)
     viewport->PlatformUserData = viewport->PlatformHandle = nullptr;
 }
 
-static void ImGui_ImplSDL2_ShowWindow(ImGuiViewport* viewport)
+static void ImGui_ImplSDL2_ShowWindow(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplSDL2_ViewportData* vd = (ImGui_ImplSDL2_ViewportData*)viewport->PlatformUserData;
 #if defined(_WIN32)
@@ -928,7 +928,7 @@ static void ImGui_ImplSDL2_ShowWindow(ImGuiViewport* viewport)
     SDL_ShowWindow(vd->Window);
 }
 
-static ImVec2 ImGui_ImplSDL2_GetWindowPos(ImGuiViewport* viewport)
+static ImVec2 ImGui_ImplSDL2_GetWindowPos(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplSDL2_ViewportData* vd = (ImGui_ImplSDL2_ViewportData*)viewport->PlatformUserData;
     int x = 0, y = 0;
@@ -936,13 +936,13 @@ static ImVec2 ImGui_ImplSDL2_GetWindowPos(ImGuiViewport* viewport)
     return ImVec2((float)x, (float)y);
 }
 
-static void ImGui_ImplSDL2_SetWindowPos(ImGuiViewport* viewport, ImVec2 pos)
+static void ImGui_ImplSDL2_SetWindowPos(ImGuiContext*, ImGuiViewport* viewport, ImVec2 pos)
 {
     ImGui_ImplSDL2_ViewportData* vd = (ImGui_ImplSDL2_ViewportData*)viewport->PlatformUserData;
     SDL_SetWindowPosition(vd->Window, (int)pos.x, (int)pos.y);
 }
 
-static ImVec2 ImGui_ImplSDL2_GetWindowSize(ImGuiViewport* viewport)
+static ImVec2 ImGui_ImplSDL2_GetWindowSize(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplSDL2_ViewportData* vd = (ImGui_ImplSDL2_ViewportData*)viewport->PlatformUserData;
     int w = 0, h = 0;
@@ -950,52 +950,52 @@ static ImVec2 ImGui_ImplSDL2_GetWindowSize(ImGuiViewport* viewport)
     return ImVec2((float)w, (float)h);
 }
 
-static void ImGui_ImplSDL2_SetWindowSize(ImGuiViewport* viewport, ImVec2 size)
+static void ImGui_ImplSDL2_SetWindowSize(ImGuiContext*, ImGuiViewport* viewport, ImVec2 size)
 {
     ImGui_ImplSDL2_ViewportData* vd = (ImGui_ImplSDL2_ViewportData*)viewport->PlatformUserData;
     SDL_SetWindowSize(vd->Window, (int)size.x, (int)size.y);
 }
 
-static void ImGui_ImplSDL2_SetWindowTitle(ImGuiViewport* viewport, const char* title)
+static void ImGui_ImplSDL2_SetWindowTitle(ImGuiContext*, ImGuiViewport* viewport, const char* title)
 {
     ImGui_ImplSDL2_ViewportData* vd = (ImGui_ImplSDL2_ViewportData*)viewport->PlatformUserData;
     SDL_SetWindowTitle(vd->Window, title);
 }
 
 #if SDL_HAS_WINDOW_ALPHA
-static void ImGui_ImplSDL2_SetWindowAlpha(ImGuiViewport* viewport, float alpha)
+static void ImGui_ImplSDL2_SetWindowAlpha(ImGuiContext*, ImGuiViewport* viewport, float alpha)
 {
     ImGui_ImplSDL2_ViewportData* vd = (ImGui_ImplSDL2_ViewportData*)viewport->PlatformUserData;
     SDL_SetWindowOpacity(vd->Window, alpha);
 }
 #endif
 
-static void ImGui_ImplSDL2_SetWindowFocus(ImGuiViewport* viewport)
+static void ImGui_ImplSDL2_SetWindowFocus(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplSDL2_ViewportData* vd = (ImGui_ImplSDL2_ViewportData*)viewport->PlatformUserData;
     SDL_RaiseWindow(vd->Window);
 }
 
-static bool ImGui_ImplSDL2_GetWindowFocus(ImGuiViewport* viewport)
+static bool ImGui_ImplSDL2_GetWindowFocus(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplSDL2_ViewportData* vd = (ImGui_ImplSDL2_ViewportData*)viewport->PlatformUserData;
     return (SDL_GetWindowFlags(vd->Window) & SDL_WINDOW_INPUT_FOCUS) != 0;
 }
 
-static bool ImGui_ImplSDL2_GetWindowMinimized(ImGuiViewport* viewport)
+static bool ImGui_ImplSDL2_GetWindowMinimized(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplSDL2_ViewportData* vd = (ImGui_ImplSDL2_ViewportData*)viewport->PlatformUserData;
     return (SDL_GetWindowFlags(vd->Window) & SDL_WINDOW_MINIMIZED) != 0;
 }
 
-static void ImGui_ImplSDL2_RenderWindow(ImGuiViewport* viewport, void*)
+static void ImGui_ImplSDL2_RenderWindow(ImGuiContext*, ImGuiViewport* viewport, void*)
 {
     ImGui_ImplSDL2_ViewportData* vd = (ImGui_ImplSDL2_ViewportData*)viewport->PlatformUserData;
     if (vd->GLContext)
         SDL_GL_MakeCurrent(vd->Window, vd->GLContext);
 }
 
-static void ImGui_ImplSDL2_SwapBuffers(ImGuiViewport* viewport, void*)
+static void ImGui_ImplSDL2_SwapBuffers(ImGuiContext*, ImGuiViewport* viewport, void*)
 {
     ImGui_ImplSDL2_ViewportData* vd = (ImGui_ImplSDL2_ViewportData*)viewport->PlatformUserData;
     if (vd->GLContext)
@@ -1009,7 +1009,7 @@ static void ImGui_ImplSDL2_SwapBuffers(ImGuiViewport* viewport, void*)
 // SDL is graceful enough to _not_ need <vulkan/vulkan.h> so we can safely include this.
 #if SDL_HAS_VULKAN
 #include <SDL_vulkan.h>
-static int ImGui_ImplSDL2_CreateVkSurface(ImGuiViewport* viewport, ImU64 vk_instance, const void* vk_allocator, ImU64* out_vk_surface)
+static int ImGui_ImplSDL2_CreateVkSurface(ImGuiContext*, ImGuiViewport* viewport, ImU64 vk_instance, const void* vk_allocator, ImU64* out_vk_surface)
 {
     ImGui_ImplSDL2_ViewportData* vd = (ImGui_ImplSDL2_ViewportData*)viewport->PlatformUserData;
     (void)vk_allocator;

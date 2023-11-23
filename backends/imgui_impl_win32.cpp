@@ -1023,7 +1023,7 @@ static HWND ImGui_ImplWin32_GetHwndFromViewportID(ImGuiID viewport_id)
     return nullptr;
 }
 
-static void ImGui_ImplWin32_CreateWindow(ImGuiViewport* viewport)
+static void ImGui_ImplWin32_CreateWindow(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplWin32_ViewportData* vd = IM_NEW(ImGui_ImplWin32_ViewportData)();
     viewport->PlatformUserData = vd;
@@ -1044,7 +1044,7 @@ static void ImGui_ImplWin32_CreateWindow(ImGuiViewport* viewport)
     viewport->PlatformHandle = viewport->PlatformHandleRaw = vd->Hwnd;
 }
 
-static void ImGui_ImplWin32_DestroyWindow(ImGuiViewport* viewport)
+static void ImGui_ImplWin32_DestroyWindow(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplWin32_Data* bd = ImGui_ImplWin32_GetBackendData();
     if (ImGui_ImplWin32_ViewportData* vd = (ImGui_ImplWin32_ViewportData*)viewport->PlatformUserData)
@@ -1063,7 +1063,7 @@ static void ImGui_ImplWin32_DestroyWindow(ImGuiViewport* viewport)
     viewport->PlatformUserData = viewport->PlatformHandle = nullptr;
 }
 
-static void ImGui_ImplWin32_ShowWindow(ImGuiViewport* viewport)
+static void ImGui_ImplWin32_ShowWindow(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplWin32_ViewportData* vd = (ImGui_ImplWin32_ViewportData*)viewport->PlatformUserData;
     IM_ASSERT(vd->Hwnd != 0);
@@ -1073,7 +1073,7 @@ static void ImGui_ImplWin32_ShowWindow(ImGuiViewport* viewport)
         ::ShowWindow(vd->Hwnd, SW_SHOW);
 }
 
-static void ImGui_ImplWin32_UpdateWindow(ImGuiViewport* viewport)
+static void ImGui_ImplWin32_UpdateWindow(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplWin32_ViewportData* vd = (ImGui_ImplWin32_ViewportData*)viewport->PlatformUserData;
     IM_ASSERT(vd->Hwnd != 0);
@@ -1120,7 +1120,7 @@ static void ImGui_ImplWin32_UpdateWindow(ImGuiViewport* viewport)
     }
 }
 
-static ImVec2 ImGui_ImplWin32_GetWindowPos(ImGuiViewport* viewport)
+static ImVec2 ImGui_ImplWin32_GetWindowPos(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplWin32_ViewportData* vd = (ImGui_ImplWin32_ViewportData*)viewport->PlatformUserData;
     IM_ASSERT(vd->Hwnd != 0);
@@ -1129,7 +1129,7 @@ static ImVec2 ImGui_ImplWin32_GetWindowPos(ImGuiViewport* viewport)
     return ImVec2((float)pos.x, (float)pos.y);
 }
 
-static void ImGui_ImplWin32_SetWindowPos(ImGuiViewport* viewport, ImVec2 pos)
+static void ImGui_ImplWin32_SetWindowPos(ImGuiContext*, ImGuiViewport* viewport, ImVec2 pos)
 {
     ImGui_ImplWin32_ViewportData* vd = (ImGui_ImplWin32_ViewportData*)viewport->PlatformUserData;
     IM_ASSERT(vd->Hwnd != 0);
@@ -1138,7 +1138,7 @@ static void ImGui_ImplWin32_SetWindowPos(ImGuiViewport* viewport, ImVec2 pos)
     ::SetWindowPos(vd->Hwnd, nullptr, rect.left, rect.top, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
 }
 
-static ImVec2 ImGui_ImplWin32_GetWindowSize(ImGuiViewport* viewport)
+static ImVec2 ImGui_ImplWin32_GetWindowSize(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplWin32_ViewportData* vd = (ImGui_ImplWin32_ViewportData*)viewport->PlatformUserData;
     IM_ASSERT(vd->Hwnd != 0);
@@ -1147,7 +1147,7 @@ static ImVec2 ImGui_ImplWin32_GetWindowSize(ImGuiViewport* viewport)
     return ImVec2(float(rect.right - rect.left), float(rect.bottom - rect.top));
 }
 
-static void ImGui_ImplWin32_SetWindowSize(ImGuiViewport* viewport, ImVec2 size)
+static void ImGui_ImplWin32_SetWindowSize(ImGuiContext*, ImGuiViewport* viewport, ImVec2 size)
 {
     ImGui_ImplWin32_ViewportData* vd = (ImGui_ImplWin32_ViewportData*)viewport->PlatformUserData;
     IM_ASSERT(vd->Hwnd != 0);
@@ -1156,7 +1156,7 @@ static void ImGui_ImplWin32_SetWindowSize(ImGuiViewport* viewport, ImVec2 size)
     ::SetWindowPos(vd->Hwnd, nullptr, 0, 0, rect.right - rect.left, rect.bottom - rect.top, SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
 }
 
-static void ImGui_ImplWin32_SetWindowFocus(ImGuiViewport* viewport)
+static void ImGui_ImplWin32_SetWindowFocus(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplWin32_ViewportData* vd = (ImGui_ImplWin32_ViewportData*)viewport->PlatformUserData;
     IM_ASSERT(vd->Hwnd != 0);
@@ -1165,21 +1165,21 @@ static void ImGui_ImplWin32_SetWindowFocus(ImGuiViewport* viewport)
     ::SetFocus(vd->Hwnd);
 }
 
-static bool ImGui_ImplWin32_GetWindowFocus(ImGuiViewport* viewport)
+static bool ImGui_ImplWin32_GetWindowFocus(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplWin32_ViewportData* vd = (ImGui_ImplWin32_ViewportData*)viewport->PlatformUserData;
     IM_ASSERT(vd->Hwnd != 0);
     return ::GetForegroundWindow() == vd->Hwnd;
 }
 
-static bool ImGui_ImplWin32_GetWindowMinimized(ImGuiViewport* viewport)
+static bool ImGui_ImplWin32_GetWindowMinimized(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplWin32_ViewportData* vd = (ImGui_ImplWin32_ViewportData*)viewport->PlatformUserData;
     IM_ASSERT(vd->Hwnd != 0);
     return ::IsIconic(vd->Hwnd) != 0;
 }
 
-static void ImGui_ImplWin32_SetWindowTitle(ImGuiViewport* viewport, const char* title)
+static void ImGui_ImplWin32_SetWindowTitle(ImGuiContext*, ImGuiViewport* viewport, const char* title)
 {
     // ::SetWindowTextA() doesn't properly handle UTF-8 so we explicitely convert our string.
     ImGui_ImplWin32_ViewportData* vd = (ImGui_ImplWin32_ViewportData*)viewport->PlatformUserData;
@@ -1191,7 +1191,7 @@ static void ImGui_ImplWin32_SetWindowTitle(ImGuiViewport* viewport, const char* 
     ::SetWindowTextW(vd->Hwnd, title_w.Data);
 }
 
-static void ImGui_ImplWin32_SetWindowAlpha(ImGuiViewport* viewport, float alpha)
+static void ImGui_ImplWin32_SetWindowAlpha(ImGuiContext*, ImGuiViewport* viewport, float alpha)
 {
     ImGui_ImplWin32_ViewportData* vd = (ImGui_ImplWin32_ViewportData*)viewport->PlatformUserData;
     IM_ASSERT(vd->Hwnd != 0);
@@ -1209,7 +1209,7 @@ static void ImGui_ImplWin32_SetWindowAlpha(ImGuiViewport* viewport, float alpha)
     }
 }
 
-static float ImGui_ImplWin32_GetWindowDpiScale(ImGuiViewport* viewport)
+static float ImGui_ImplWin32_GetWindowDpiScale(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplWin32_ViewportData* vd = (ImGui_ImplWin32_ViewportData*)viewport->PlatformUserData;
     IM_ASSERT(vd->Hwnd != 0);
@@ -1217,7 +1217,7 @@ static float ImGui_ImplWin32_GetWindowDpiScale(ImGuiViewport* viewport)
 }
 
 // FIXME-DPI: Testing DPI related ideas
-static void ImGui_ImplWin32_OnChangedViewport(ImGuiViewport* viewport)
+static void ImGui_ImplWin32_OnChangedViewport(ImGuiContext*, ImGuiViewport* viewport)
 {
     (void)viewport;
 #if 0
