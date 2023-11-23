@@ -1630,7 +1630,7 @@ void ImGui_ImplVulkanH_DestroyAllViewportsRenderBuffers(VkDevice device, const V
 // If you are new to dear imgui or creating a new binding for dear imgui, it is recommended that you completely ignore this section first..
 //--------------------------------------------------------------------------------------------------------
 
-static void ImGui_ImplVulkan_CreateWindow(ImGuiViewport* viewport)
+static void ImGui_ImplVulkan_CreateWindow(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplVulkan_Data* bd = ImGui_ImplVulkan_GetBackendData();
     ImGui_ImplVulkan_ViewportData* vd = IM_NEW(ImGui_ImplVulkan_ViewportData)();
@@ -1674,7 +1674,7 @@ static void ImGui_ImplVulkan_CreateWindow(ImGuiViewport* viewport)
     vd->WindowOwned = true;
 }
 
-static void ImGui_ImplVulkan_DestroyWindow(ImGuiViewport* viewport)
+static void ImGui_ImplVulkan_DestroyWindow(ImGuiContext*, ImGuiViewport* viewport)
 {
     // The main viewport (owned by the application) will always have RendererUserData == 0 since we didn't create the data for it.
     ImGui_ImplVulkan_Data* bd = ImGui_ImplVulkan_GetBackendData();
@@ -1689,7 +1689,7 @@ static void ImGui_ImplVulkan_DestroyWindow(ImGuiViewport* viewport)
     viewport->RendererUserData = nullptr;
 }
 
-static void ImGui_ImplVulkan_SetWindowSize(ImGuiViewport* viewport, ImVec2 size)
+static void ImGui_ImplVulkan_SetWindowSize(ImGuiContext*, ImGuiViewport* viewport, ImVec2 size)
 {
     ImGui_ImplVulkan_Data* bd = ImGui_ImplVulkan_GetBackendData();
     ImGui_ImplVulkan_ViewportData* vd = (ImGui_ImplVulkan_ViewportData*)viewport->RendererUserData;
@@ -1700,7 +1700,7 @@ static void ImGui_ImplVulkan_SetWindowSize(ImGuiViewport* viewport, ImVec2 size)
     ImGui_ImplVulkanH_CreateOrResizeWindow(v->Instance, v->PhysicalDevice, v->Device, &vd->Window, v->QueueFamily, v->Allocator, (int)size.x, (int)size.y, v->MinImageCount);
 }
 
-static void ImGui_ImplVulkan_RenderWindow(ImGuiViewport* viewport, void*)
+static void ImGui_ImplVulkan_RenderWindow(ImGuiContext*, ImGuiViewport* viewport, void*)
 {
     ImGui_ImplVulkan_Data* bd = ImGui_ImplVulkan_GetBackendData();
     ImGui_ImplVulkan_ViewportData* vd = (ImGui_ImplVulkan_ViewportData*)viewport->RendererUserData;
@@ -1833,7 +1833,7 @@ static void ImGui_ImplVulkan_RenderWindow(ImGuiViewport* viewport, void*)
     }
 }
 
-static void ImGui_ImplVulkan_SwapBuffers(ImGuiViewport* viewport, void*)
+static void ImGui_ImplVulkan_SwapBuffers(ImGuiContext*, ImGuiViewport* viewport, void*)
 {
     ImGui_ImplVulkan_Data* bd = ImGui_ImplVulkan_GetBackendData();
     ImGui_ImplVulkan_ViewportData* vd = (ImGui_ImplVulkan_ViewportData*)viewport->RendererUserData;

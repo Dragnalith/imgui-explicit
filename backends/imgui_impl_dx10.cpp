@@ -610,7 +610,7 @@ struct ImGui_ImplDX10_ViewportData
     ~ImGui_ImplDX10_ViewportData()  { IM_ASSERT(SwapChain == nullptr && RTView == nullptr); }
 };
 
-static void ImGui_ImplDX10_CreateWindow(ImGuiViewport* viewport)
+static void ImGui_ImplDX10_CreateWindow(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplDX10_Data* bd = ImGui_ImplDX10_GetBackendData();
     ImGui_ImplDX10_ViewportData* vd = IM_NEW(ImGui_ImplDX10_ViewportData)();
@@ -649,7 +649,7 @@ static void ImGui_ImplDX10_CreateWindow(ImGuiViewport* viewport)
     }
 }
 
-static void ImGui_ImplDX10_DestroyWindow(ImGuiViewport* viewport)
+static void ImGui_ImplDX10_DestroyWindow(ImGuiContext*, ImGuiViewport* viewport)
 {
     // The main viewport (owned by the application) will always have RendererUserData == 0 here since we didn't create the data for it.
     if (ImGui_ImplDX10_ViewportData* vd = (ImGui_ImplDX10_ViewportData*)viewport->RendererUserData)
@@ -665,7 +665,7 @@ static void ImGui_ImplDX10_DestroyWindow(ImGuiViewport* viewport)
     viewport->RendererUserData = nullptr;
 }
 
-static void ImGui_ImplDX10_SetWindowSize(ImGuiViewport* viewport, ImVec2 size)
+static void ImGui_ImplDX10_SetWindowSize(ImGuiContext*, ImGuiViewport* viewport, ImVec2 size)
 {
     ImGui_ImplDX10_Data* bd = ImGui_ImplDX10_GetBackendData();
     ImGui_ImplDX10_ViewportData* vd = (ImGui_ImplDX10_ViewportData*)viewport->RendererUserData;
@@ -685,7 +685,7 @@ static void ImGui_ImplDX10_SetWindowSize(ImGuiViewport* viewport, ImVec2 size)
     }
 }
 
-static void ImGui_ImplDX10_RenderViewport(ImGuiViewport* viewport, void*)
+static void ImGui_ImplDX10_RenderViewport(ImGuiContext*, ImGuiViewport* viewport, void*)
 {
     ImGui_ImplDX10_Data* bd = ImGui_ImplDX10_GetBackendData();
     ImGui_ImplDX10_ViewportData* vd = (ImGui_ImplDX10_ViewportData*)viewport->RendererUserData;
@@ -696,7 +696,7 @@ static void ImGui_ImplDX10_RenderViewport(ImGuiViewport* viewport, void*)
     ImGui_ImplDX10_RenderDrawData(viewport->DrawData);
 }
 
-static void ImGui_ImplDX10_SwapBuffers(ImGuiViewport* viewport, void*)
+static void ImGui_ImplDX10_SwapBuffers(ImGuiContext*, ImGuiViewport* viewport, void*)
 {
     ImGui_ImplDX10_ViewportData* vd = (ImGui_ImplDX10_ViewportData*)viewport->RendererUserData;
     vd->SwapChain->Present(0, 0); // Present without vsync

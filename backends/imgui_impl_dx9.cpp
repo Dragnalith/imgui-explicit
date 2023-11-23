@@ -419,7 +419,7 @@ struct ImGui_ImplDX9_ViewportData
     ~ImGui_ImplDX9_ViewportData() { IM_ASSERT(SwapChain == nullptr); }
 };
 
-static void ImGui_ImplDX9_CreateWindow(ImGuiViewport* viewport)
+static void ImGui_ImplDX9_CreateWindow(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplDX9_Data* bd = ImGui_ImplDX9_GetBackendData();
     ImGui_ImplDX9_ViewportData* vd = IM_NEW(ImGui_ImplDX9_ViewportData)();
@@ -446,7 +446,7 @@ static void ImGui_ImplDX9_CreateWindow(ImGuiViewport* viewport)
     IM_ASSERT(vd->SwapChain != nullptr);
 }
 
-static void ImGui_ImplDX9_DestroyWindow(ImGuiViewport* viewport)
+static void ImGui_ImplDX9_DestroyWindow(ImGuiContext*, ImGuiViewport* viewport)
 {
     // The main viewport (owned by the application) will always have RendererUserData == 0 since we didn't create the data for it.
     if (ImGui_ImplDX9_ViewportData* vd = (ImGui_ImplDX9_ViewportData*)viewport->RendererUserData)
@@ -460,7 +460,7 @@ static void ImGui_ImplDX9_DestroyWindow(ImGuiViewport* viewport)
     viewport->RendererUserData = nullptr;
 }
 
-static void ImGui_ImplDX9_SetWindowSize(ImGuiViewport* viewport, ImVec2 size)
+static void ImGui_ImplDX9_SetWindowSize(ImGuiContext*, ImGuiViewport* viewport, ImVec2 size)
 {
     ImGui_ImplDX9_Data* bd = ImGui_ImplDX9_GetBackendData();
     ImGui_ImplDX9_ViewportData* vd = (ImGui_ImplDX9_ViewportData*)viewport->RendererUserData;
@@ -475,7 +475,7 @@ static void ImGui_ImplDX9_SetWindowSize(ImGuiViewport* viewport, ImVec2 size)
     }
 }
 
-static void ImGui_ImplDX9_RenderWindow(ImGuiViewport* viewport, void*)
+static void ImGui_ImplDX9_RenderWindow(ImGuiContext*, ImGuiViewport* viewport, void*)
 {
     ImGui_ImplDX9_Data* bd = ImGui_ImplDX9_GetBackendData();
     ImGui_ImplDX9_ViewportData* vd = (ImGui_ImplDX9_ViewportData*)viewport->RendererUserData;
@@ -506,7 +506,7 @@ static void ImGui_ImplDX9_RenderWindow(ImGuiViewport* viewport, void*)
     if (last_depth_stencil) last_depth_stencil->Release();
 }
 
-static void ImGui_ImplDX9_SwapBuffers(ImGuiViewport* viewport, void*)
+static void ImGui_ImplDX9_SwapBuffers(ImGuiContext*, ImGuiViewport* viewport, void*)
 {
     ImGui_ImplDX9_ViewportData* vd = (ImGui_ImplDX9_ViewportData*)viewport->RendererUserData;
     HRESULT hr = vd->SwapChain->Present(nullptr, nullptr, vd->d3dpp.hDeviceWindow, nullptr, 0);
@@ -534,7 +534,7 @@ static void ImGui_ImplDX9_CreateDeviceObjectsForPlatformWindows()
     ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
     for (int i = 1; i < platform_io.Viewports.Size; i++)
         if (!platform_io.Viewports[i]->RendererUserData)
-            ImGui_ImplDX9_CreateWindow(platform_io.Viewports[i]);
+            ImGui_ImplDX9_CreateWindow(ImGui::GetCurrentContext(), platform_io.Viewports[i]);
 }
 
 static void ImGui_ImplDX9_InvalidateDeviceObjectsForPlatformWindows()
@@ -542,7 +542,7 @@ static void ImGui_ImplDX9_InvalidateDeviceObjectsForPlatformWindows()
     ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO();
     for (int i = 1; i < platform_io.Viewports.Size; i++)
         if (platform_io.Viewports[i]->RendererUserData)
-            ImGui_ImplDX9_DestroyWindow(platform_io.Viewports[i]);
+            ImGui_ImplDX9_DestroyWindow(ImGui::GetCurrentContext(), platform_io.Viewports[i]);
 }
 
 //-----------------------------------------------------------------------------

@@ -36,7 +36,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 // Support function for multi-viewports
 // Unlike most other backend combination, we need specific hooks to combine Win32+OpenGL.
 // We could in theory decide to support Win32-specific code in OpenGL backend via e.g. an hypothetical ImGui_ImplOpenGL3_InitForRawWin32().
-static void Hook_Renderer_CreateWindow(ImGuiViewport* viewport)
+static void Hook_Renderer_CreateWindow(ImGuiContext*, ImGuiViewport* viewport)
 {
     assert(viewport->RendererUserData == NULL);
 
@@ -45,7 +45,7 @@ static void Hook_Renderer_CreateWindow(ImGuiViewport* viewport)
     viewport->RendererUserData = data;
 }
 
-static void Hook_Renderer_DestroyWindow(ImGuiViewport* viewport)
+static void Hook_Renderer_DestroyWindow(ImGuiContext*, ImGuiViewport* viewport)
 {
     if (viewport->RendererUserData != NULL)
     {
@@ -56,14 +56,14 @@ static void Hook_Renderer_DestroyWindow(ImGuiViewport* viewport)
     }
 }
 
-static void Hook_Platform_RenderWindow(ImGuiViewport* viewport, void*)
+static void Hook_Platform_RenderWindow(ImGuiContext*, ImGuiViewport* viewport, void*)
 {
     // Activate the platform window DC in the OpenGL rendering context
     if (WGL_WindowData* data = (WGL_WindowData*)viewport->RendererUserData)
         wglMakeCurrent(data->hDC, g_hRC);
 }
 
-static void Hook_Renderer_SwapBuffers(ImGuiViewport* viewport, void*)
+static void Hook_Renderer_SwapBuffers(ImGuiContext*, ImGuiViewport* viewport, void*)
 {
     if (WGL_WindowData* data = (WGL_WindowData*)viewport->RendererUserData)
         ::SwapBuffers(data->hDC);

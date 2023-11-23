@@ -415,7 +415,7 @@ struct ImGuiViewportDataMetal
     bool                        FirstFrame = true;
 };
 
-static void ImGui_ImplMetal_CreateWindow(ImGuiViewport* viewport)
+static void ImGui_ImplMetal_CreateWindow(ImGuiContext*, ImGuiViewport* viewport)
 {
     ImGui_ImplMetal_Data* bd = ImGui_ImplMetal_GetBackendData();
     ImGuiViewportDataMetal* data = IM_NEW(ImGuiViewportDataMetal)();
@@ -443,7 +443,7 @@ static void ImGui_ImplMetal_CreateWindow(ImGuiViewport* viewport)
     data->Handle = handle;
 }
 
-static void ImGui_ImplMetal_DestroyWindow(ImGuiViewport* viewport)
+static void ImGui_ImplMetal_DestroyWindow(ImGuiContext*, ImGuiViewport* viewport)
 {
     // The main viewport (owned by the application) will always have RendererUserData == 0 since we didn't create the data for it.
     if (ImGuiViewportDataMetal* data = (ImGuiViewportDataMetal*)viewport->RendererUserData)
@@ -456,13 +456,13 @@ inline static CGSize MakeScaledSize(CGSize size, CGFloat scale)
     return CGSizeMake(size.width * scale, size.height * scale);
 }
 
-static void ImGui_ImplMetal_SetWindowSize(ImGuiViewport* viewport, ImVec2 size)
+static void ImGui_ImplMetal_SetWindowSize(ImGuiContext*, ImGuiViewport* viewport, ImVec2 size)
 {
     ImGuiViewportDataMetal* data = (ImGuiViewportDataMetal*)viewport->RendererUserData;
     data->MetalLayer.drawableSize = MakeScaledSize(CGSizeMake(size.x, size.y), viewport->DpiScale);
 }
 
-static void ImGui_ImplMetal_RenderWindow(ImGuiViewport* viewport, void*)
+static void ImGui_ImplMetal_RenderWindow(ImGuiContext*, ImGuiViewport* viewport, void*)
 {
     ImGuiViewportDataMetal* data = (ImGuiViewportDataMetal*)viewport->RendererUserData;
 
