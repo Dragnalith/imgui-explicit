@@ -2360,7 +2360,6 @@ struct ImGuiTextFilter
         bool            empty() const                   { return b == e; }
         IMGUI_API void  split(char separator, ImVector<ImGuiTextRange>* out) const;
     };
-    ImGuiContext*           Ctx;            // Parent UI context (needs to be set explicitly by caller).
     char                    InputBuf[256];
     ImVector<ImGuiTextRange>Filters;
     int                     CountGrep;

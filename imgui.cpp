@@ -2554,8 +2554,6 @@ ImGuiTextFilter::ImGuiTextFilter(const char* default_filter) //-V1077
 
 bool ImGuiTextFilter::Draw(const char* label, float width)
 {
-    IM_UNUSED(Ctx); // Will be used when the context will become explicit
-
     if (width != 0.0f)
         ImGui::SetNextItemWidth(width);
     bool value_changed = ImGui::InputText(label, InputBuf, IM_ARRAYSIZE(InputBuf));
