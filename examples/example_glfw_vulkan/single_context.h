@@ -6,6 +6,52 @@
 #include <cstdio>
 
 #ifdef MULTI_THREADED
+#include <mutex>
+
+#include <condition_variable>
+#include <functional>
+#include <queue>
+
+struct JobQueue
+{
+    std::mutex m;
+    std::queue<std::function<void()>> jobs;
+
+    void enqueue(std::function<void()> job)
+    {
+        std::lock_guard<std::mutex> lg{m};
+        jobs.emplace(std::move(job));
+    }
+};
+
+extern JobQueue glfQueue;
+
+void awakenGlfw();
+
+template <typename F>
+void wait_for_main(F &&ftor)
+{
+    std::mutex m;
+    std::condition_variable cv;
+    bool ready = false;
+    auto doTheDeed = [&ftor, &m, &cv, &ready]()
+    {
+        ftor();
+        // Awaken the thread that requested the work.
+        {
+            std::lock_guard<std::mutex> lk(m);
+            ready = true;
+        }
+        cv.notify_one();
+    };
+    // Queue the task
+    glfQueue.enqueue(doTheDeed);
+    // Awaken glfw
+    awakenGlfw();
+    // Wait for it to be done.
+    std::unique_lock<std::mutex> lk(m);
+    cv.wait(lk, [&ready]{ return ready; });
+}
 #else
 template <typename F>
 void wait_for_main(F&& functor)
