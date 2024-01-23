@@ -113,13 +113,16 @@ int main(int, char**)
 
     while (ThreadWindow::nActive > 0)
     {
-        glfwPollEvents();
-        // glfwWaitEvents();
-        std::lock_guard<std::mutex> lg{glfQueue.m};
+        // glfwPollEvents();
+        glfwWaitEvents();
         while (!glfQueue.jobs.empty())
         {
-            auto job = glfQueue.jobs.front();
-            glfQueue.jobs.pop();
+            std::function<void()> job;
+            {
+                std::lock_guard<std::mutex> lg{glfQueue.m};
+                job = glfQueue.jobs.front();
+                glfQueue.jobs.pop();
+            }
             job();
         }
     }
