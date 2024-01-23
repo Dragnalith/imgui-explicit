@@ -18,11 +18,12 @@
 #include "imgui_impl_vulkan.h"
 #include <stdio.h>          // printf, fprintf
 #include <stdlib.h>         // abort
+#include <thread>
 #define GLFW_INCLUDE_NONE
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan.h>
-//#include <vulkan/vulkan_beta.h>
+#define MULTI_THREADED
 #include "single_context.h"
 
 // [Win32] Our example includes a copy of glfw3.lib pre-compiled with VS2010 to maximize ease of testing and compatibility with old VS compilers.
@@ -38,31 +39,30 @@
 #endif
 
 // Data
-VkAllocationCallbacks*   ThreadWindow::g_Allocator = nullptr;
-VkInstance               ThreadWindow::g_Instance = VK_NULL_HANDLE;
-VkPhysicalDevice         ThreadWindow::g_PhysicalDevice = VK_NULL_HANDLE;
-VkDevice                 ThreadWindow::g_Device = VK_NULL_HANDLE;
-uint32_t                 ThreadWindow::g_QueueFamily = (uint32_t)-1;
-VkQueue                  ThreadWindow::g_Queue = VK_NULL_HANDLE;
+VkAllocationCallbacks* ThreadWindow::g_Allocator = nullptr;
+VkInstance ThreadWindow::g_Instance = VK_NULL_HANDLE;
+VkPhysicalDevice ThreadWindow::g_PhysicalDevice = VK_NULL_HANDLE;
+VkDevice ThreadWindow::g_Device = VK_NULL_HANDLE;
+uint32_t ThreadWindow::g_QueueFamily = (uint32_t)-1;
+VkQueue ThreadWindow::g_Queue = VK_NULL_HANDLE;
 // static VkDebugReportCallbackEXT ThreadWindow::g_DebugReport = VK_NULL_HANDLE;
-VkPipelineCache          ThreadWindow::g_PipelineCache = VK_NULL_HANDLE;
-VkDescriptorPool         ThreadWindow::g_DescriptorPool = VK_NULL_HANDLE;
+VkPipelineCache ThreadWindow::g_PipelineCache = VK_NULL_HANDLE;
+VkDescriptorPool ThreadWindow::g_DescriptorPool = VK_NULL_HANDLE;
 
-int                      ThreadWindow::g_MinImageCount = 2;
+int ThreadWindow::g_MinImageCount = 2;
 
 int ThreadWindow::nActive = 0;
+
+JobQueue glfQueue;
 
 static void glfw_error_callback(int error, const char* description)
 {
     fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
-static void check_vk_result(VkResult err)
+
+void awakenGlfw()
 {
-    if (err == 0)
-        return;
-    fprintf(stderr, "[vulkan] Error: VkResult = %d\n", err);
-    if (err < 0)
-        abort();
+    glfwPostEmptyEvent();
 }
 
 #ifdef IMGUI_VULKAN_DEBUG_REPORT
@@ -99,28 +99,35 @@ int main(int, char**)
     ThreadWindow::SetupVulkan(extensions);
 
     const int numWindows = 3;
-    ThreadWindow windows[numWindows];
-    for (int i = 0; i < numWindows; ++i)
-        windows[i].fullSetup();
 
-    while(true)
-    {
-        int count = 0;
-        for (auto &window: windows)
+    std::vector<std::thread> threads;
+    threads.reserve(numWindows);
+    for (int i = 0; i < numWindows; ++i)
+        threads.emplace_back([&]
         {
-            if (window.isActive)
+            ThreadWindow window;
+            window.fullSetup();
+            while (window.oneFrame());
+            window.close();
+        });
+
+    while (ThreadWindow::nActive > 0)
+    {
+        // glfwPollEvents();
+        glfwWaitEvents();
+        while (!glfQueue.jobs.empty())
+        {
+            std::function<void()> job;
             {
-                if (!window.oneFrame())
-                {
-                    window.close();
-                }
+                std::lock_guard<std::mutex> lg{glfQueue.m};
+                job = glfQueue.jobs.front();
+                glfQueue.jobs.pop();
             }
-            count += window.isActive;
+            job();
         }
-        if (count == 0)
-            break;
-        glfwPollEvents();
     }
+    for (auto& t : threads)
+        t.join();
 
     ThreadWindow::CleanupVulkan();
 
