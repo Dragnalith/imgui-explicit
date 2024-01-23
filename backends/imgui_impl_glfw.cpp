@@ -143,6 +143,10 @@ enum GlfwClientApi
     GlfwClientApi_Vulkan
 };
 
+// Count of monitor change update. Used to check if a context needs to
+// check for the update.
+int g_MonitorUpdateCount = 0;
+
 struct ImGui_ImplGlfw_Data
 {
     GLFWwindow*             Window;
@@ -154,7 +158,7 @@ struct ImGui_ImplGlfw_Data
     GLFWwindow*             KeyOwnerWindows[GLFW_KEY_LAST];
     bool                    InstalledCallbacks;
     bool                    CallbacksChainForAllWindows;
-    bool                    WantUpdateMonitors;
+    int                     WantUpdateMonitors;
 #ifdef __EMSCRIPTEN__
     const char*             CanvasSelector;
 #endif
@@ -172,7 +176,11 @@ struct ImGui_ImplGlfw_Data
     WNDPROC                 PrevWndProc;
 #endif
 
-    ImGui_ImplGlfw_Data()   { memset((void*)this, 0, sizeof(*this)); }
+    ImGui_ImplGlfw_Data()
+    {
+        memset((void*)this, 0, sizeof(*this));
+        WantUpdateMonitors = g_MonitorUpdateCount;
+    }
 };
 
 // Backend data stored in io.BackendPlatformUserData to allow support for multiple Dear ImGui contexts
@@ -496,10 +504,7 @@ void ImGui_ImplGlfw_CharCallback(GLFWwindow* window, unsigned int c)
 }
 void ImGui_ImplGlfw_MonitorCallback(GLFWmonitor*m, int)
 {
-    // TODO Figure out how to handle this. It's global, but this code wants to associated it
-    // with a context.
-    // ImGui_ImplGlfw_Data* bd = ImGui_ImplGlfw_GetBackendData();
-    // bd->WantUpdateMonitors = true;
+    ++g_MonitorUpdateCount;
 }
 
 #ifdef __EMSCRIPTEN__
@@ -597,7 +602,7 @@ static bool ImGui_ImplGlfw_Init(ImGuiContext* ctx, GLFWwindow* window, bool inst
 
     bd->Window = window;
     bd->Time = 0.0;
-    bd->WantUpdateMonitors = true;
+    bd->WantUpdateMonitors = g_MonitorUpdateCount - 1;
 
     io.SetClipboardTextFn = ImGui_ImplGlfw_SetClipboardText;
     io.GetClipboardTextFn = ImGui_ImplGlfw_GetClipboardText;
@@ -870,7 +875,7 @@ static void ImGui_ImplGlfw_UpdateMonitors(ImGuiContext* ctx)
 {
     ImGui_ImplGlfw_Data* bd = ImGui_ImplGlfw_GetBackendData(ctx);
     ImGuiPlatformIO& platform_io = ImGui::GetPlatformIO(ctx);
-    bd->WantUpdateMonitors = false;
+    bd->WantUpdateMonitors = g_MonitorUpdateCount;
 
     int monitors_count = 0;
     GLFWmonitor** glfw_monitors = glfwGetMonitors(&monitors_count);
@@ -922,7 +927,7 @@ void ImGui_ImplGlfw_NewFrame(ImGuiContext* ctx)
     io.DisplaySize = ImVec2((float)w, (float)h);
     if (w > 0 && h > 0)
         io.DisplayFramebufferScale = ImVec2((float)display_w / (float)w, (float)display_h / (float)h);
-    if (bd->WantUpdateMonitors)
+    if (bd->WantUpdateMonitors != g_MonitorUpdateCount)
         ImGui_ImplGlfw_UpdateMonitors(ctx);
 
     // Setup time step
